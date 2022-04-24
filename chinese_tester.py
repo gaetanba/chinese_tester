@@ -169,6 +169,7 @@ def contest(controller, round = 20):
 
 
 if __name__ == "__main__":
+	print(teamRows)
 	controller = Controller()
 	controller.instanciate_data(dictionary)
 
