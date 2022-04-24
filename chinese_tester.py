@@ -72,7 +72,7 @@ class Controller:
 			)
 
 
-	def select_item(self):
+	def select_item(self, mode):
 		def _get_item(self):
 			selected_item = self._select_item()
 			index = self.dictionary.index(selected_item)
@@ -81,9 +81,12 @@ class Controller:
 		while index in self.recently_seen:
 			index, selected_item = _get_item(self)
 
-		self.selected_category = random.choice(
-			list(selected_item.keys())
-			)
+		if mode == 'random':
+			self.selected_category = random.choice(
+				list(selected_item.keys())
+				)
+		else:
+			self.selected_category = mode
 		self.selected_question = random.choice(
 			selected_item[self.selected_category]
 			)
@@ -123,11 +126,11 @@ class Controller:
 		return False
 
 
-def contest(controller, round = 20):
+def contest(controller, round = 20, mode = 'random'):
 	count = 0
 	for i in range(round):
 
-		controller.select_item()
+		controller.select_item(mode)
 		
 		print(f"{str(i+1).zfill(len(str(round)))}/{round}: {controller.selected_category} is:", controller.selected_question)
 		
@@ -167,9 +170,21 @@ def contest(controller, round = 20):
 	print(f"End, score={str(count).zfill(len(str(round)))}/{round}")
 
 
+def convert_to_int(e):
+	if isinstance(e, (int, float, str)):
+		return int(e)
+	return False
+
 
 if __name__ == "__main__":
 	controller = Controller()
 	controller.instanciate_data(dictionary)
-
-	contest(controller, round = 5)
+	print("How many round?")
+	number_of_round = convert_to_int(input())
+	assert number_of_round
+	print("\nmode (give index):\n1-random\n2-word\n3-pronunciation\n4-translation")
+	m = convert_to_int(input())
+	print("\n")
+	assert m in [1, 2, 3, 4]
+	mode = ["random", "word", 'pronunciation', "translation"][m-1]
+	contest(controller, round = int(number_of_round), mode = mode)
