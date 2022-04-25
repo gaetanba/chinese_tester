@@ -9,6 +9,7 @@ response = requests.get(spreadsheetURL)
 data = response.content
 teamRows = list(csv.reader(data.decode("utf-8").splitlines()))
 
+
 def format_teamRows_todict(teamRows):
 	dictionary = []
 	for element in teamRows:
@@ -22,7 +23,9 @@ def format_teamRows_todict(teamRows):
 		)
 	return dictionary
 
+
 dictionary = format_teamRows_todict(teamRows)
+
 
 class Controller:
 
@@ -138,6 +141,7 @@ class Controller:
 
 
 def contest(controller, round = 20, mode = 'random'):
+	print("\n")
 	count = 0
 	for i in range(round):
 
@@ -179,24 +183,38 @@ def contest(controller, round = 20, mode = 'random'):
 			print("🎉🎉🎉", result, "\n")
 			count += 1
 
-	print(f"End, score={str(count).zfill(len(str(round)))}/{round}")
+	print(f"End, score={str(count).zfill(len(str(round)))}/{round}\n")
+	restart = input("restart? y / n:\n")
+	if restart == "y":
+		contest(controller, round, mode)
 
 
 def convert_to_int(e):
-	if isinstance(e, (int, float, str)):
+	if isinstance(e, (int, float)):
 		return int(e)
+	elif isinstance(e, str):
+		try:
+			return int(e)
+		except: return False
 	return False
 
 
 if __name__ == "__main__":
 	controller = Controller()
 	controller.instanciate_data(dictionary)
-	print("How many round?")
-	number_of_round = convert_to_int(input())
+	number_of_round = convert_to_int(input("How many round? "))
 	assert number_of_round
-	print("\nmode (give index):\n1-random\n2-word\n3-pronunciation\n4-translation")
-	m = convert_to_int(input())
+	print("\nmode:\n    1-random\n    2-word\n    3-pronunciation\n    4-translation")
+	m = convert_to_int(input("give index: "))
 	print("\n")
 	assert m in [1, 2, 3, 4]
 	mode = ["random", "word", 'pronunciation', "translation"][m-1]
-	contest(controller, round = int(number_of_round), mode = mode)
+
+	start_settings = input("start or settings: ")
+	assert start_settings in ["start", "settings"]
+	if start_settings == "start":
+		print("\n--------------------------")
+		print("        Here we go")
+		print("--------------------------")
+
+		contest(controller, round = int(number_of_round), mode = mode)
