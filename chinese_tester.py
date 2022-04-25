@@ -41,10 +41,13 @@ class Controller:
 		self.pronunciation_2_word = defaultdict(list)
 		self.translation_2_word = defaultdict(list)
 		self.word_2_translation = defaultdict(list)
+		self.all_chars = set()
 		for elem in dictionary:
 			pronunciation = elem.get("pronunciation")
 			translation = elem.get("translation")
 			word = elem.get("word")
+			for w in word:
+				for x in w: self.all_chars.add(x)
 			for i, c in enumerate(word):
 				self.word_2_pronunciation[c] = pronunciation[i]
 				self.word_2_translation[c].extend(translation)
@@ -72,7 +75,7 @@ class Controller:
 			)
 
 
-	def select_item(self, mode):
+	def select_item(self, mode = 'random'):
 		def _get_item(self):
 			selected_item = self._select_item()
 			index = self.dictionary.index(selected_item)
@@ -126,6 +129,14 @@ class Controller:
 		return False
 
 
+	def input_answer(self, text):
+		value = input(text)
+		if value == "help":
+			print("".join(sorted(list(self.all_chars))))
+			self.input_answer(text)
+		return value
+
+
 def contest(controller, round = 20, mode = 'random'):
 	count = 0
 	for i in range(round):
@@ -136,16 +147,17 @@ def contest(controller, round = 20, mode = 'random'):
 		
 		if controller.selected_category == "pronunciation":
 			pronunciation = controller.selected_question
-			word = input("\t• word ")
-			translation = input('\t• translation: ')
+			word = controller.input_answer("\t• word ")
+			translation = controller.input_answer('\t• translation: ')
 		elif controller.selected_category == "word":
 			word = controller.selected_question
-			pronunciation = input("\t• pronunciation: ")
-			translation = input('\t• translation: ')
+			pronunciation = controller.input_answer("\t• pronunciation: ")
+			translation = controller.input_answer('\t• translation: ')
 		else:
 			translation = controller.selected_question
-			word = input("\t• word: ")
-			pronunciation = input("\t• pronunciation: ")
+			word = controller.input_answer("\t• word: ")
+			pronunciation = controller.input_answer("\t• pronunciation: ")
+
 
 		result = controller.verify_answer(
 			word = word, 
