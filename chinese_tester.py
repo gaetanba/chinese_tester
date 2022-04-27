@@ -167,7 +167,6 @@ class Controller:
         elif self.selected_category == "pronunciation":
             word = self.pronunciation_2_word[self.selected_question]
             translation = [self.word_2_translation[w] for w in word]
-            print("translation", translation)
         else: # category == "translation"
             translation = self.selected_question
             word = self.translation_2_word.get(translation)
@@ -243,7 +242,6 @@ def contest(controller, round = 20, mode = 'random'):
             answer["pronunciation"] = controller.word_2_pronunciation[word]
             answer_string = ''
             for k, v in answer.items():
-                print("v", v)
                 v = convert_list_to_string(v)
                 answer_string += f"{k}: {v}, "
             print("💥💥💥", result, "answer:", answer_string, "\n")
