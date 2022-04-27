@@ -72,6 +72,18 @@ def sanitize_element(element):
         return element
 
 
+def convert_list_to_string(iterable):
+    text = ""
+    if isinstance(iterable, str):
+        return iterable
+    for elem in iterable:
+        if isinstance(elem, str):
+            text += f"{elem} "
+        else: 
+            text += convert_list_to_string(text)
+    return text
+
+
 class Controller:
 
 
@@ -154,7 +166,8 @@ class Controller:
             translation = self.word_2_translation[self.selected_question]
         elif self.selected_category == "pronunciation":
             word = self.pronunciation_2_word[self.selected_question]
-            translation = [x for w in word for x in self.word_2_translation[w]]
+            translation = [self.word_2_translation[w] for w in word]
+            print("translation", translation)
         else: # category == "translation"
             translation = self.selected_question
             word = self.translation_2_word.get(translation)
@@ -166,7 +179,7 @@ class Controller:
         if self.selected_category == "pronunciation":
             anwserwords = sanitize_element(self.answer["word"])
             answertranslation = sanitize_element(self.answer["translation"][self.answer["word"].index(word)])
-            if word in anwserwords and translation == answertranslation:
+            if word in anwserwords and translation in answertranslation:
                 return True
 
         elif self.selected_category == "word":
@@ -230,7 +243,9 @@ def contest(controller, round = 20, mode = 'random'):
             answer["pronunciation"] = controller.word_2_pronunciation[word]
             answer_string = ''
             for k, v in answer.items():
-                answer_string += f"{k}: {' '.join(v) if isinstance(v,list) else v}, "
+                print("v", v)
+                v = convert_list_to_string(v)
+                answer_string += f"{k}: {v}, "
             print("💥💥💥", result, "answer:", answer_string, "\n")
         else:
             print("🎉🎉🎉", result, "\n")
@@ -256,8 +271,8 @@ if __name__ == "__main__":
     mode = ["random", "word", 'pronunciation', "translation"][m-1]
 
     start_settings = input("start or settings: ")
-    assert start_settings in ["start", "settings"]
-    if start_settings == "start":
+    assert start_settings in ["start", "settings", "1", 1]
+    if start_settings in ["start", "1", 1]:
         print("\n--------------------------")
         print("        Here we go")
         print("--------------------------")
