@@ -2,15 +2,11 @@ from collections import defaultdict
 import random
 import csv
 import requests
+import string
+import unicodedata
 
 
-spreadsheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSu9lE7IWNrwypkuhQ2MmtGmfImmVVHW57GG4dE8ij5lP06SRhPPIHq5G5w_8NdIgN9-voL4kEMwzYS/pub?gid=520398043&single=true&output=csv"
-response = requests.get(spreadsheetURL)
-data = response.content
-teamRows = list(csv.reader(data.decode("utf-8").splitlines()))
-
-
-def format_teamRows_todict(teamRows):
+def format_dictionary_todict(teamRows):
 	dictionary = []
 	for element in teamRows:
 		word, pronunciation, translation = element
@@ -24,7 +20,46 @@ def format_teamRows_todict(teamRows):
 	return dictionary
 
 
-dictionary = format_teamRows_todict(teamRows)
+def get_dictionary(spreadsheetURL=None):
+	if spreadsheetURL is None:
+		spreadsheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSu9lE7IWNrwypkuhQ2MmtGmfImmVVHW57GG4dE8ij5lP06SRhPPIHq5G5w_8NdIgN9-voL4kEMwzYS/pub?gid=520398043&single=true&output=csv"
+
+	response = requests.get(spreadsheetURL)
+	data = response.content
+	dictionary = list(csv.reader(data.decode("utf-8").splitlines()))
+
+	return format_dictionary_todict(dictionary)
+
+
+def pop_accent(character):
+	composition = unicodedata.decomposition(character).split()
+	for comp in composition:
+		char = chr(int(comp,16))
+		if char in string.ascii_letters:
+			return char
+	return character
+
+
+def sanitize_string(string, removeAccent = True):
+	elements_to_remove = [" ", "\n", "\t"]
+	for elem in elements_to_remove:
+		string = string.replace(elem, "")
+	string.lower()
+	if removeAccent:
+		ns = ""
+		for char in string:
+			ns += pop_accent(char)
+		return ns
+	return string
+
+
+def sanitize_element(element):
+	if isinstance(element, list):
+		return [sanitize_string(e) for e in element]
+	elif isinstance(element, str):
+		return sanitize_string(element)
+	else:
+		return element
 
 
 class Controller:
@@ -119,15 +154,17 @@ class Controller:
 
 	def verify_answer(self, word = "", pronunciation = "", translation = ""):
 		if self.selected_category == "pronunciation":
-			if word in self.answer["word"] and translation == self.answer["translation"][self.answer["word"].index(word)]:
+			anwserwords = sanitize_element(self.answer["word"])
+			answertranslation = sanitize_element(self.answer["translation"][self.answer["word"].index(word)])
+			if word in anwserwords and translation == answertranslation:
 				return True
 		elif self.selected_category == "word":
 			for p in self._reformatstring(pronunciation):
-				if p == self.word_2_pronunciation[word] and translation in self.word_2_translation[word]:
+				if p == sanitize_element(self.word_2_pronunciation[word]) and translation in sanitize_element(self.word_2_translation[word]):
 					return True
 		else:
 			for p in self._reformatstring(pronunciation):
-				if word in self.translation_2_word[translation] and p == self.word_2_pronunciation[word]:
+				if word in sanitize_element(self.translation_2_word[translation]) and p == sanitize_element(self.word_2_pronunciation[word]):
 					return True
 		return False
 
@@ -151,7 +188,7 @@ def contest(controller, round = 20, mode = 'random'):
 		
 		if controller.selected_category == "pronunciation":
 			pronunciation = controller.selected_question
-			word = controller.input_answer("\t• word ")
+			word = controller.input_answer("\t• word: ")
 			translation = controller.input_answer('\t• translation: ')
 		elif controller.selected_category == "word":
 			word = controller.selected_question
@@ -164,9 +201,9 @@ def contest(controller, round = 20, mode = 'random'):
 
 
 		result = controller.verify_answer(
-			word = word, 
-			pronunciation = pronunciation, 
-			translation = translation
+			word = sanitize_element(word), 
+			pronunciation = sanitize_element(pronunciation), 
+			translation = sanitize_element(translation)
 			)
 
 		if not result:
@@ -201,6 +238,7 @@ def convert_to_int(e):
 
 if __name__ == "__main__":
 	controller = Controller()
+	dictionary = get_dictionary()
 	controller.instanciate_data(dictionary)
 	number_of_round = convert_to_int(input("How many round? "))
 	assert number_of_round
