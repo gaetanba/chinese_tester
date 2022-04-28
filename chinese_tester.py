@@ -101,6 +101,12 @@ class Controller:
         self.pronunciation_2_word = defaultdict(list)
         self.translation_2_word = defaultdict(list)
         self.word_2_translation = defaultdict(list)
+
+        self.word_2_pronunciation_sanitized = {}
+        self.pronunciation_2_word_sanitized = defaultdict(list)
+        self.translation_2_word_sanitized = defaultdict(list)
+        self.word_2_translation_sanitized = defaultdict(list)
+
         self.all_chars = set()
         for elem in dictionary:
             pronunciation = elem.get("pronunciation")
@@ -111,10 +117,16 @@ class Controller:
             for i, c in enumerate(word):
                 self.word_2_pronunciation[c] = pronunciation[i]
                 self.word_2_translation[c].extend(translation)
+
+                self.word_2_pronunciation_sanitized[sanitize_element(c)] = sanitize_element(pronunciation[i])
+                self.word_2_translation_sanitized[sanitize_element(c)].extend(sanitize_element(translation))
             for t in translation:
                 self.translation_2_word[t].extend(word)
+                self.translation_2_word_sanitized[sanitize_element(t)].extend(sanitize_element(word))
         for k, v in self.word_2_pronunciation.items():
             self.pronunciation_2_word[v].append(k)
+            self.pronunciation_2_word_sanitized[sanitize_element(v)].append(sanitize_element(k))
+
 
 
     def _reformatstring(self, e):
@@ -177,21 +189,23 @@ class Controller:
     def verify_answer(self, word = "", pronunciation = "", translation = ""):
         if self.selected_category == "pronunciation":
             anwserwords = sanitize_element(self.answer["word"])
+            if not word in self.answer["word"]:
+                return False
             answertranslation = sanitize_element(self.answer["translation"][self.answer["word"].index(word)])
             if word in anwserwords and translation in answertranslation:
                 return True
 
         elif self.selected_category == "word":
             for p in self._reformatstring(pronunciation):
-                answerpronunciation = sanitize_element(self.word_2_pronunciation[word])
-                answertranslation = sanitize_element(self.word_2_translation[word])
+                answerpronunciation = sanitize_element(self.word_2_pronunciation_sanitized[word])
+                answertranslation = sanitize_element(self.word_2_translation_sanitized[word])
                 if p == answerpronunciation and translation in answertranslation:
                     return True
 
         else:
             for p in self._reformatstring(pronunciation):
-                answerword = sanitize_element(self.translation_2_word[translation])
-                answerpronunciation = sanitize_element(self.word_2_pronunciation[word])
+                answerword = sanitize_element(self.translation_2_word_sanitized[translation])
+                answerpronunciation = sanitize_element(self.word_2_pronunciation_sanitized[word])
                 if word in answerword and p == answerpronunciation:
                     return True
         return False
