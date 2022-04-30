@@ -216,7 +216,7 @@ class Controller:
         if value == "help" and controller.selected_category != "word":
             print("".join(sorted(list(self.all_chars))))
             self.input_answer(text)
-        else:
+        elif value == "help" and controller.selected_category == "word":
             import speech
             txt = controller.selected_question
             lang = "zh-CN"
