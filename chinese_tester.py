@@ -213,12 +213,23 @@ class Controller:
 
     def input_answer(self, text, controller):
         value = input(text)
+        #help
         if value == "help" and controller.selected_category != "word":
             print("".join(sorted(list(self.all_chars))))
             value = self.input_answer(text, controller)
             return value
-        elif value == "help" and controller.selected_category == "word":
+        elif value in ["help", "sound", "s"] and controller.selected_category == "word":
             import speech
+            txt = controller.selected_question
+            lang = "zh-CN"
+            speech.say(txt, language = lang)
+            speech.wait()
+            value = self.input_answer(text, controller)
+            return value
+        elif value in ["help", "sound", "s"]:
+            import speech
+            print("".join(sorted(list(self.all_chars))))
+            value = self.input_answer(text, controller)
             txt = controller.selected_question
             lang = "zh-CN"
             speech.say(txt, language = lang)
