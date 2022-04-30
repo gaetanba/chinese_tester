@@ -211,10 +211,17 @@ class Controller:
         return False
 
 
-    def input_answer(self, text):
+    def input_answer(self, text, controller):
         value = input(text)
-        if value == "help":
+        if value == "help" and controller.selected_category != "word":
             print("".join(sorted(list(self.all_chars))))
+            self.input_answer(text)
+        else:
+            import speech
+            txt = controller.selected_question
+            lang = "zh-CN"
+            speech.say(txt, language = lang)
+            speech.wait()
             self.input_answer(text)
         return value
 
@@ -230,16 +237,34 @@ def contest(controller, round = 20, mode = 'random'):
         
         if controller.selected_category == "pronunciation":
             pronunciation = controller.selected_question
-            word = controller.input_answer("\t• word: ")
-            translation = controller.input_answer('\t• translation: ')
+            word = controller.input_answer(
+                "\t• word: ", 
+                controller
+                )
+            translation = controller.input_answer(
+                '\t• translation: ', 
+                controller
+                )
         elif controller.selected_category == "word":
             word = controller.selected_question
-            pronunciation = controller.input_answer("\t• pronunciation: ")
-            translation = controller.input_answer('\t• translation: ')
+            pronunciation = controller.input_answer(
+                "\t• pronunciation: ", 
+                controller
+                )
+            translation = controller.input_answer(
+                '\t• translation: ', 
+                controller
+                )
         else:
             translation = controller.selected_question
-            word = controller.input_answer("\t• word: ")
-            pronunciation = controller.input_answer("\t• pronunciation: ")
+            word = controller.input_answer(
+                "\t• word: ", 
+                controller
+                )
+            pronunciation = controller.input_answer(
+                "\t• pronunciation: ", 
+                controller
+                )
 
 
         result = controller.verify_answer(
