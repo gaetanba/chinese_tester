@@ -160,7 +160,6 @@ class Controller:
     def _select_item(self):
         lenght = len(self.dictionary)
         weights = sigmoide(self.dictionary, lamb = 10/lenght)
-        print(lenght, len(weights))
         selected_list = random.choices(
             self.dictionary,
             weights = weights,
