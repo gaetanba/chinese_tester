@@ -11,7 +11,7 @@ def sigmoide(elements, lamb = 1):
     items = []
     l = len(elements)
     x0 = -l // 2
-    xn = abs(x0)
+    xn = abs(x0) - l % 2
     
     for x in range(x0, xn):
         r = l / (1 + math.e ** (-x * lamb))
@@ -160,6 +160,7 @@ class Controller:
     def _select_item(self):
         lenght = len(self.dictionary)
         weights = sigmoide(self.dictionary, lamb = 10/lenght)
+        print(lenght, len(weights))
         selected_list = random.choices(
             self.dictionary,
             weights = weights,
