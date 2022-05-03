@@ -325,15 +325,19 @@ def dictation(controller, round):
     print("\n")
     def inputdictation(controller):
         controller.speech_word(sentence)
-        inp = input("again / verify / next: ")
-        if inp in ["a", "again", "A", "Again"]:
+        inp = input("repeat / verify / next: ")
+        if inp in ["r", "repeat", "R", "Repeat"]:
             inputdictation(controller)
         elif inp in ["verify", "Verify", "v", "V"]:
             print("word:", sentence)
             print("pronunciation:", convert_list_to_string(controller.word_2_pronunciation[sentence]))
             print("translation:", convert_list_to_string(controller.word_2_translation[sentence]))
-            inp = input("next: ")
-            pass
+            inp = input("repeat / next: ")
+            if inp in ["r", "repeat", "R", "Repeat"]:
+                inputdictation(controller)
+        else:
+            print("word:", sentence)
+            input()
 
     sentences = controller.dictation(round)
 
