@@ -322,17 +322,24 @@ def contest(controller, round=20, mode="random"):
 
 
 def dictation(controller, round):
-    sentences = controller.dictation(round)
-
-    for sentence in sentences:
+    def inputdictation(controller):
         controller.speech_word(sentence)
-        inp = input("verify or next: ")
-        if inp == "verify":
+        inp = input("again / verify / next: ")
+        if inp in ["a", "again", "A", "Again"]:
+            inputdictation(controller)
+        elif inp in ["verify", "Verify", "v", "V"]:
             print(sentence)
             print(convert_list_to_string(controller.word_2_pronunciation[sentence]))
             print(convert_list_to_string(controller.word_2_translation[sentence]))
-            inp = input("verify or next: ")
+            inp = input("next: ")
             pass
+        print("\n")
+
+    sentences = controller.dictation(round)
+
+    for sentence in sentences:
+        inputdictation(controller)
+        controller.speech_word(sentence)
 
     restart = input("New round? y / n:\n")
     if restart == "y":
