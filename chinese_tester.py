@@ -325,7 +325,7 @@ def contest(controller, round=20, mode="random"):
 def dictation(controller, round):
     print("\n")
 
-    def inputdictation(controller):
+    def inputdictation(controller, verified = False):
         def print_answer(controller):
             print("word:", sentence)
             print(
@@ -341,15 +341,17 @@ def dictation(controller, round):
         inp = input("repeat / verify / next: ")
         repeat_choices = ["r", "repeat", "R", "Repeat"]
         if inp in repeat_choices:
-            inputdictation(controller)
+            inputdictation(controller, verified)
         elif inp in ["verify", "Verify", "v", "V"]:
             print_answer(controller)
+            verified = True
             inp = input("repeat / next: ")
             if inp in repeat_choices:
-                inputdictation(controller)
+                inputdictation(controller, verified)
         else:
-            print_answer(controller)
-            time.sleep(2)
+            if not verified:
+                print_answer(controller)
+                time.sleep(2)
 
     sentences = controller.dictation(round)
 
