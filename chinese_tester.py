@@ -384,7 +384,7 @@ if __name__ == "__main__":
         contest(controller, round=int(number_of_round), mode=mode)
 
     elif question_listening in ["Listening", "listening", 2, "2", "l", "L"]:
-        number_of_round = convert_to_int(input("How many sentendes? "))
+        number_of_round = convert_to_int(input("How many sentences? "))
         assert number_of_round
         print("\n--------------------------")
         print("        Here we go")
