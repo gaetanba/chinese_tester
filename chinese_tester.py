@@ -327,7 +327,8 @@ def dictation(controller, round):
     def inputdictation(controller):
         controller.speech_word(sentence)
         inp = input("repeat / verify / next: ")
-        if inp in ["r", "repeat", "R", "Repeat"]:
+        repeat_choices = ["r", "repeat", "R", "Repeat"]
+        if inp in repeat_choices:
             inputdictation(controller)
         elif inp in ["verify", "Verify", "v", "V"]:
             print("word:", sentence)
@@ -340,7 +341,7 @@ def dictation(controller, round):
                 convert_list_to_string(controller.word_2_translation[sentence]),
             )
             inp = input("repeat / next: ")
-            if inp in ["r", "repeat", "R", "Repeat"]:
+            if inp in repeat_choices:
                 inputdictation(controller)
         else:
             print("word:", sentence)
