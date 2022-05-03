@@ -131,7 +131,6 @@ class Controller:
             for i, c in enumerate(word):
                 self.word_2_pronunciation[c] = pronunciation[i]
                 self.word_2_translation[c].extend(translation)
-                print("pronunciation[i], sanitize_element(pronunciation[i])",pronunciation[i], sanitize_element(pronunciation[i]))
                 self.word_2_pronunciation_sanitized[sanitize_element(c)] = sanitize_element(pronunciation[i])
                 self.word_2_translation_sanitized[sanitize_element(c)].extend(sanitize_element(translation))
             for t in translation:
@@ -219,7 +218,6 @@ class Controller:
             for p in self._reformatstring(pronunciation):
                 answerpronunciation = sanitize_element(self.word_2_pronunciation_sanitized[word])
                 answertranslation = sanitize_element(self.word_2_translation_sanitized[word])
-                print(answertranslation, answerpronunciation)
                 if p == answerpronunciation and translation in answertranslation:
                     return True
 
