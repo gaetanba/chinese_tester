@@ -323,6 +323,7 @@ def contest(controller, round=20, mode="random"):
 
 def dictation(controller, round):
     print("\n")
+
     def inputdictation(controller):
         controller.speech_word(sentence)
         inp = input("repeat / verify / next: ")
@@ -330,8 +331,14 @@ def dictation(controller, round):
             inputdictation(controller)
         elif inp in ["verify", "Verify", "v", "V"]:
             print("word:", sentence)
-            print("pronunciation:", convert_list_to_string(controller.word_2_pronunciation[sentence]))
-            print("translation:", convert_list_to_string(controller.word_2_translation[sentence]))
+            print(
+                "pronunciation:",
+                convert_list_to_string(controller.word_2_pronunciation[sentence]),
+            )
+            print(
+                "translation:",
+                convert_list_to_string(controller.word_2_translation[sentence]),
+            )
             inp = input("repeat / next: ")
             if inp in ["r", "repeat", "R", "Repeat"]:
                 inputdictation(controller)
@@ -350,12 +357,9 @@ def dictation(controller, round):
         dictation(controller, round)
 
 
-if __name__ == "__main__":
-    controller = Controller()
-    dictionary = get_dictionary()
-    controller.instanciate_data(dictionary)
-
+def menu(controller):
     question_listening = input("Questions / listening / settings: ")
+
     print("\n")
     if question_listening in [
         "Questions",
@@ -386,6 +390,7 @@ if __name__ == "__main__":
         print("--------------------------")
 
         contest(controller, round=int(number_of_round), mode=mode)
+        menu(controller)
 
     elif question_listening in ["Listening", "listening", 2, "2", "l", "L"]:
         number_of_round = convert_to_int(input("How many sentences? "))
@@ -395,6 +400,15 @@ if __name__ == "__main__":
         print("--------------------------")
 
         dictation(controller, number_of_round)
+        menu(controller)
     else:
         # todo implement settings
+        menu(controller)
         pass
+
+
+if __name__ == "__main__":
+    controller = Controller()
+    dictionary = get_dictionary()
+    controller.instanciate_data(dictionary)
+    menu(controller)
