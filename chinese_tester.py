@@ -334,12 +334,12 @@ def dictation(controller, round):
             print("translation:", convert_list_to_string(controller.word_2_translation[sentence]))
             inp = input("next: ")
             pass
-        print("\n")
 
     sentences = controller.dictation(round)
 
     for sentence in sentences:
         inputdictation(controller)
+        print("\n")
 
     restart = input("New round? y / n:\n")
     if restart == "y":
