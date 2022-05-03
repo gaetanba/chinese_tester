@@ -5,6 +5,7 @@ import requests
 import string
 import unicodedata
 import math
+import time
 
 
 def sigmoide(elements, lamb=1):
@@ -325,12 +326,7 @@ def dictation(controller, round):
     print("\n")
 
     def inputdictation(controller):
-        controller.speech_word(sentence)
-        inp = input("repeat / verify / next: ")
-        repeat_choices = ["r", "repeat", "R", "Repeat"]
-        if inp in repeat_choices:
-            inputdictation(controller)
-        elif inp in ["verify", "Verify", "v", "V"]:
+        def print_answer(controller):
             print("word:", sentence)
             print(
                 "pronunciation:",
@@ -340,12 +336,20 @@ def dictation(controller, round):
                 "translation:",
                 convert_list_to_string(controller.word_2_translation[sentence]),
             )
+
+        controller.speech_word(sentence)
+        inp = input("repeat / verify / next: ")
+        repeat_choices = ["r", "repeat", "R", "Repeat"]
+        if inp in repeat_choices:
+            inputdictation(controller)
+        elif inp in ["verify", "Verify", "v", "V"]:
+            print_answer(controller)
             inp = input("repeat / next: ")
             if inp in repeat_choices:
                 inputdictation(controller)
         else:
-            print("word:", sentence)
-            input()
+            print_answer(controller)
+            time.sleep(2)
 
     sentences = controller.dictation(round)
 
