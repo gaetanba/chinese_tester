@@ -390,6 +390,7 @@ def menu(controller):
         print("--------------------------")
 
         contest(controller, round=int(number_of_round), mode=mode)
+        print("\n")
         menu(controller)
 
     elif question_listening in ["Listening", "listening", 2, "2", "l", "L"]:
@@ -400,6 +401,7 @@ def menu(controller):
         print("--------------------------")
 
         dictation(controller, number_of_round)
+        print("\n")
         menu(controller)
     else:
         # todo implement settings
