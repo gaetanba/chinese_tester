@@ -222,10 +222,10 @@ class Controller:
         elif self.selected_category == "word":
             for p in self._reformatstring(pronunciation):
                 answerpronunciation = sanitize_element(
-                    self.word_2_pronunciation_sanitized[word]
+                    self.word_2_pronunciation_sanitized.get(word, "")
                 )
                 answertranslation = sanitize_element(
-                    self.word_2_translation_sanitized[word]
+                    self.word_2_translation_sanitized.get(word, "")
                 )
                 if p == answerpronunciation and translation in answertranslation:
                     return True
@@ -233,10 +233,10 @@ class Controller:
         else:
             for p in self._reformatstring(pronunciation):
                 answerword = sanitize_element(
-                    self.translation_2_word_sanitized[translation]
+                    self.translation_2_word_sanitized.get(translation, "")
                 )
                 answerpronunciation = sanitize_element(
-                    self.word_2_pronunciation_sanitized[word]
+                    self.word_2_pronunciation_sanitized.get(word, "")
                 )
                 if word in answerword and p == answerpronunciation:
                     return True
