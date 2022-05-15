@@ -364,17 +364,20 @@ def dictation(controller, round):
         dictation(controller, round)
 
 
-def speach(controller):
-    print("\n")
+def speach(controller, prev = ""):
     to_say = input("word(s): ")
     if to_say in ["stop", "s", "return"]:
         return
-    controller.speech_word(to_say)
-    speach(controller)
+    if to_say in ["r", "repeat"]:
+        controller.speech_word(prev)
+        speach(controller, prev)
+    else:
+        controller.speech_word(to_say)
+        speach(controller, to_say)
 
 
 def menu(controller):
-    question_listening = input("Questions / dictationc / speach / settings: ")
+    question_listening = input("Questions / dictation / speach / settings: ")
 
     print("\n")
     if question_listening in [
