@@ -364,8 +364,17 @@ def dictation(controller, round):
         dictation(controller, round)
 
 
+def speach(controller):
+    print("\n")
+    to_say = input("word(s): ")
+    if to_say in ["stop", "s", "return"]:
+        return
+    controller.speech_word(to_say)
+    speach(controller)
+
+
 def menu(controller):
-    question_listening = input("Questions / listening / settings: ")
+    question_listening = input("Questions / dictationc / speach / settings: ")
 
     print("\n")
     if question_listening in [
@@ -400,7 +409,7 @@ def menu(controller):
         print("\n")
         menu(controller)
 
-    elif question_listening in ["Listening", "listening", 2, "2", "l", "L"]:
+    elif question_listening in ["Dictation", "dictation", 2, "2", "d", "D"]:
         number_of_round = convert_to_int(input("How many sentences? "))
         assert number_of_round
         print("\n--------------------------")
@@ -410,6 +419,18 @@ def menu(controller):
         dictation(controller, number_of_round)
         print("\n")
         menu(controller)
+
+    elif question_listening in ["Speach", "speach", 3, "3", "s", "S"]:
+        # number_of_round = convert_to_int(input("How many sentences? "))
+        # assert number_of_round
+        print("\n--------------------------")
+        print("        Here we go")
+        print("--------------------------")
+
+        speach(controller)
+        print("\n")
+        menu(controller)
+
     else:
         # todo implement settings
         menu(controller)
