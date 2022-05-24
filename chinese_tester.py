@@ -108,7 +108,7 @@ class Settings:
         self.controller = controller
         self.distribution = "sigmoide_i"
         self._available_distribution = (
-            "sigmoide_i sigmoide_-i uniform linear_i linear_-i"
+            "sigmoide_i sigmoide_-i uniform linear_i linear_-i gaussian"
         )
 
     @property
@@ -117,42 +117,50 @@ class Settings:
 
     def __repr__(self):
         text = f"""
-    sound = {self.sound}
+    1- sound = {self.sound}
 
-    test_range = {', '.join([str(x) for x in self.test_range])} (-> {self.available_range})
+    2- test_range = {', '.join([str(x) for x in self.test_range])} (-> {self.available_range})
 
-    distribution = {self.distribution}, 
-        (-> sigmoide_i    ＿/￣
+    3- distribution = {self.distribution}, 
+        (
+            sigmoide_i    ＿/￣
             sigmoide_-i   ￣\\＿
             uniform       ––––
             linear_i      /
-            linear_-i)    \\
+            linear_-i    \\
+            gaussian      ＿/\\＿
+        )
     """
         return text
 
     def set(self, value):
         value = value.replace(" = ", "=")
         k, v = value.split("=")
-        if k == "sound":
+
+        if k in ["sound", "1"]:
             try:
                 self.sound = int(v)
             except:
-                return "wrong value"
-        elif k == "test_range":
+                return False
+
+        elif k in ["test_range", "2"]:
             try:
                 v = v.replace(" ", "")
                 v0, vn = v.split(",")
                 self.test_range = [int(v0), int(vn)]
             except:
-                return "wrong value"
-        elif k == "distribution":
+                return False
+
+        elif k in ["distribution", "3"]:
             if v in self._available_distribution.split():
                 self.distribution = v
             else:
-                return "wrong value"
+                return False
+
         else:
-            return "wrong value"
-        return "value accepted"
+            return False
+
+        return True
 
 
 class Controller:
@@ -452,7 +460,12 @@ def settings(controller):
 
     else:
         response = controller.settings.set(value)
-        print(response)
+        if response:
+            print("\n")
+            print(controller.settings)
+            print("\n")
+        else:
+            print("Wrong value")
     settings(controller)
 
 
