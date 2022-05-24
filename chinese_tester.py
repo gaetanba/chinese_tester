@@ -8,13 +8,13 @@ import math
 import time
 
 
-def sigmoide(elements, lamb=1, increasing = True):
+def sigmoide(elements, lamb=1, increasing=True):
     items = []
     l = len(elements)
     x0 = -l // 2
     xn = abs(x0) - l % 2
     i = lambda i: 1 - i * 2
-    
+
     for x in range(x0, xn):
         r = l / (1 + math.e ** (i(increasing) * x * lamb))
         items.append(r)
@@ -102,43 +102,39 @@ def convert_list_to_string(iterable):
 
 
 class Settings:
-
-
     def __init__(self, controller):
         self.sound = False
         self.test_range = []
         self.controller = controller
-        self.distribution = "sigmoide_i"#sigmoide_i sigmoide_-i uniform linear_i linear_-i
-        self._available_distribution = "sigmoide_i sigmoide_-i uniform linear_i linear_-i"
-
+        self.distribution = "sigmoide_i"
+        self._available_distribution = (
+            "sigmoide_i sigmoide_-i uniform linear_i linear_-i"
+        )
 
     @property
     def available_range(self):
         return f"0, {len(controller._dictionary)}"
 
-
     def __repr__(self):
         text = f"""
-        sound = {self.sound}
+    sound = {self.sound}
 
-        test_range = {', '.join([str(x) for x in self.test_range])} (-> {self.available_range})
+    test_range = {', '.join([str(x) for x in self.test_range])} (-> {self.available_range})
 
-        distribution = {self.distribution}, 
-            (-> sigmoide_i
-                sigmoide_-i
-                uniform
-                linear_i
-                linear_-i)
-        """
+    distribution = {self.distribution}, 
+        (-> sigmoide_i    ＿/￣
+            sigmoide_-i   ￣\\＿
+            uniform       ––––
+            linear_i      /
+            linear_-i)    \\
+    """
         return text
-        # return '\n'.join([f"{x}: {getattr(self, x)}" for x in vars(self)])
-
 
     def set(self, value):
         value = value.replace(" = ", "=")
         k, v = value.split("=")
         if k == "sound":
-            try: 
+            try:
                 self.sound = int(v)
             except:
                 return "wrong value"
@@ -160,26 +156,21 @@ class Settings:
 
 
 class Controller:
-
-
     def __init__(self):
         self.retention = 10
         self.recently_seen = []
         self._dictionary = []
         self.settings = Settings(self)
 
-
     @property
     def dictionary(self):
         v0, vn = self.settings.test_range
-        return self._dictionary[v0: vn]
-
+        return self._dictionary[v0:vn]
 
     @dictionary.setter
     def dictionary(self, value):
         self._dictionary = value
         self.settings.test_range = [0, len(value)]
-
 
     def instanciate_data(self):
         # self.dictionary = dictionary
@@ -221,16 +212,13 @@ class Controller:
                 sanitize_element(k)
             )
 
-
     def _reformatstring(self, e):
         return [e, e.replace(" ", ""), e.lower()]
-
 
     def _add_item(self, index):
         if len(self.recently_seen) >= self.retention:
             self.recently_seen.pop(0)
         self.recently_seen.append(index)
-
 
     def _select_item(self, dictionary=None):
         if dictionary is None:
@@ -242,11 +230,13 @@ class Controller:
         index = dictionary.index(selected_item)
         return index, selected_item
 
-
     def dictation(self, number=10):
         items = []
         added = []
-        available_items = [x for x in self.word_2_translation.keys() if len(x) > 1]
+        v0, vn = self.settings.test_range
+        available_items = [
+            x for x in list(self.word_2_translation.keys())[v0:vn] if len(x) > 1
+        ]
         if number >= len(available_items):
             number = len(available_items)
             random.shuffle(available_items)
@@ -260,7 +250,6 @@ class Controller:
                 added.append(index)
                 items.append(selected_item)
         return items
-
 
     def select_question(self, mode="random"):
         index, selected_item = self._select_item()
@@ -285,7 +274,6 @@ class Controller:
             word = self.translation_2_word.get(translation)
         self.answer = dict(word=word, translation=translation)
         self._add_item(index)
-
 
     def verify_answer(self, word="", pronunciation="", translation=""):
         if self.selected_category == "pronunciation":
@@ -321,7 +309,6 @@ class Controller:
                     return True
         return False
 
-
     def input_answer(self, text, controller):
         value = input(text)
         # help
@@ -340,7 +327,6 @@ class Controller:
             value = self.input_answer(text, controller)
             return value
         return value
-
 
     def speech_word(self, word, lang="zh-CN"):
         import speech
@@ -406,8 +392,7 @@ def contest(controller, round=20, mode="random"):
 def dictation(controller, round):
     print("\n")
 
-
-    def inputdictation(controller, verified = False):
+    def inputdictation(controller, verified=False):
         def print_answer(controller):
             print("word:", sentence)
             print(
@@ -418,7 +403,6 @@ def dictation(controller, round):
                 "translation:",
                 convert_list_to_string(controller.word_2_translation[sentence]),
             )
-
 
         controller.speech_word(sentence)
         inp = input("repeat / verify / next: ")
@@ -447,7 +431,7 @@ def dictation(controller, round):
         dictation(controller, round)
 
 
-def speach(controller, prev = ""):
+def speach(controller, prev=""):
     to_say = input("word(s): ")
     if to_say in ["stop", "s", "return"]:
         return
@@ -460,7 +444,7 @@ def speach(controller, prev = ""):
 
 
 def settings(controller):
-    
+
     value = input("name = value -> ")
 
     if value in ["r", "return"]:
