@@ -111,6 +111,7 @@ class Settings:
         self.distribution = "sigmoide_i"#sigmoide_i sigmoide_-i uniform linear_i linear_-i
         self._available_distribution = "sigmoide_i sigmoide_-i uniform linear_i linear_-i"
 
+
     @property
     def available_range(self):
         return f"0, {len(controller._dictionary)}"
@@ -120,11 +121,14 @@ class Settings:
         text = f"""
         sound = {self.sound}
 
-        test_range = {', '.join([str(x) for x in self.test_range])}, 
-            available = {self.available_range}
-            
+        test_range = {', '.join([str(x) for x in self.test_range])} (-> {self.available_range})
+
         distribution = {self.distribution}, 
-            available = {" / ".join(self._available_distribution.split())}
+            (-> sigmoide_i
+                sigmoide_-i
+                uniform
+                linear_i
+                linear_-i)
         """
         return text
         # return '\n'.join([f"{x}: {getattr(self, x)}" for x in vars(self)])
