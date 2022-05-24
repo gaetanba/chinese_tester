@@ -8,14 +8,15 @@ import math
 import time
 
 
-def sigmoide(elements, lamb=1):
+def sigmoide(elements, lamb=1, increasing = True):
     items = []
     l = len(elements)
     x0 = -l // 2
     xn = abs(x0) - l % 2
-
+    i = lambda i: 1 - i * 2
+    
     for x in range(x0, xn):
-        r = l / (1 + math.e ** (-x * lamb))
+        r = l / (1 + math.e ** (i(increasing) * x * lamb))
         items.append(r)
 
     return items
@@ -100,16 +101,84 @@ def convert_list_to_string(iterable):
     return text
 
 
+class Settings:
+
+
+    def __init__(self, controller):
+        self.sound = False
+        self.test_range = []
+        self.controller = controller
+        self.distribution = "sigmoide_i"#sigmoide_i sigmoide_-i uniform linear_i linear_-i
+        self._available_distribution = "sigmoide_i sigmoide_-i uniform linear_i linear_-i"
+
+    @property
+    def available_range(self):
+        return f"0, {len(controller._dictionary)}"
+
+
+    def __repr__(self):
+        text = f"""
+        sound = {self.sound}
+
+        test_range = {', '.join([str(x) for x in self.test_range])}, 
+            available = {self.available_range}
+            
+        distribution = {self.distribution}, 
+            available = {" / ".join(self._available_distribution.split())}
+        """
+        return text
+        # return '\n'.join([f"{x}: {getattr(self, x)}" for x in vars(self)])
+
+
+    def set(self, value):
+        value = value.replace(" = ", "=")
+        k, v = value.split("=")
+        if k == "sound":
+            try: 
+                self.sound = int(v)
+            except:
+                return "wrong value"
+        elif k == "test_range":
+            try:
+                v = v.replace(" ", "")
+                v0, vn = v.split(",")
+                self.test_range = [int(v0), int(vn)]
+            except:
+                return "wrong value"
+        elif k == "distribution":
+            if v in self._available_distribution.split():
+                self.distribution = v
+            else:
+                return "wrong value"
+        else:
+            return "wrong value"
+        return "value accepted"
+
+
 class Controller:
 
-    selection_rule = 0.25
 
     def __init__(self):
         self.retention = 10
         self.recently_seen = []
+        self._dictionary = []
+        self.settings = Settings(self)
 
-    def instanciate_data(self, dictionary):
-        self.dictionary = dictionary
+
+    @property
+    def dictionary(self):
+        v0, vn = self.settings.test_range
+        return self._dictionary[v0: vn]
+
+
+    @dictionary.setter
+    def dictionary(self, value):
+        self._dictionary = value
+        self.settings.test_range = [0, len(value)]
+
+
+    def instanciate_data(self):
+        # self.dictionary = dictionary
         self.word_2_pronunciation = {}
         self.pronunciation_2_word = defaultdict(list)
         self.translation_2_word = defaultdict(list)
@@ -121,7 +190,7 @@ class Controller:
         self.word_2_translation_sanitized = defaultdict(list)
 
         self.all_chars = set()
-        for elem in dictionary:
+        for elem in self.dictionary:
             pronunciation = elem.get("pronunciation")
             translation = elem.get("translation")
             word = elem.get("word")
@@ -148,13 +217,16 @@ class Controller:
                 sanitize_element(k)
             )
 
+
     def _reformatstring(self, e):
         return [e, e.replace(" ", ""), e.lower()]
+
 
     def _add_item(self, index):
         if len(self.recently_seen) >= self.retention:
             self.recently_seen.pop(0)
         self.recently_seen.append(index)
+
 
     def _select_item(self, dictionary=None):
         if dictionary is None:
@@ -165,6 +237,7 @@ class Controller:
         selected_item = selected_list[0]
         index = dictionary.index(selected_item)
         return index, selected_item
+
 
     def dictation(self, number=10):
         items = []
@@ -183,6 +256,7 @@ class Controller:
                 added.append(index)
                 items.append(selected_item)
         return items
+
 
     def select_question(self, mode="random"):
         index, selected_item = self._select_item()
@@ -207,6 +281,7 @@ class Controller:
             word = self.translation_2_word.get(translation)
         self.answer = dict(word=word, translation=translation)
         self._add_item(index)
+
 
     def verify_answer(self, word="", pronunciation="", translation=""):
         if self.selected_category == "pronunciation":
@@ -242,6 +317,7 @@ class Controller:
                     return True
         return False
 
+
     def input_answer(self, text, controller):
         value = input(text)
         # help
@@ -260,6 +336,7 @@ class Controller:
             value = self.input_answer(text, controller)
             return value
         return value
+
 
     def speech_word(self, word, lang="zh-CN"):
         import speech
@@ -325,6 +402,7 @@ def contest(controller, round=20, mode="random"):
 def dictation(controller, round):
     print("\n")
 
+
     def inputdictation(controller, verified = False):
         def print_answer(controller):
             print("word:", sentence)
@@ -336,6 +414,7 @@ def dictation(controller, round):
                 "translation:",
                 convert_list_to_string(controller.word_2_translation[sentence]),
             )
+
 
         controller.speech_word(sentence)
         inp = input("repeat / verify / next: ")
@@ -374,6 +453,19 @@ def speach(controller, prev = ""):
     else:
         controller.speech_word(to_say)
         speach(controller, to_say)
+
+
+def settings(controller):
+    
+    value = input("name = value -> ")
+
+    if value in ["r", "return"]:
+        return
+
+    else:
+        response = controller.settings.set(value)
+        print(response)
+    settings(controller)
 
 
 def menu(controller):
@@ -434,6 +526,19 @@ def menu(controller):
         print("\n")
         menu(controller)
 
+    elif question_listening in ["Settings", "settings", 4, "4", "se", "Se"]:
+        # number_of_round = convert_to_int(input("How many sentences? "))
+        # assert number_of_round
+        print("\n--------------------------")
+        print("        Settings")
+        print("--------------------------")
+        print("\n")
+        print(controller.settings)
+        print("\n")
+        settings(controller)
+        print("\n")
+        menu(controller)
+
     else:
         # todo implement settings
         menu(controller)
@@ -443,5 +548,6 @@ def menu(controller):
 if __name__ == "__main__":
     controller = Controller()
     dictionary = get_dictionary()
-    controller.instanciate_data(dictionary)
+    controller.dictionary = dictionary
+    controller.instanciate_data()
     menu(controller)
