@@ -337,6 +337,7 @@ class Controller:
         if value in ["settings"]:
             print(self.settings, "\n")
             settings(self)
+            print(f"({self.selected_question})")
             value = self.input_answer(text, controller)
             return value
         return value
