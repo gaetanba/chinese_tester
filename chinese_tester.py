@@ -334,6 +334,11 @@ class Controller:
             self.speech_word(controller.selected_question)
             value = self.input_answer(text, controller)
             return value
+        if value in ["settings"]:
+            print(self.settings, "\n")
+            settings(self)
+            value = self.input_answer(text, controller)
+            return value
         return value
 
     def speech_word(self, word, lang="zh-CN"):
@@ -429,6 +434,10 @@ def dictation(controller, round):
             inp = input("repeat / next: ")
             if inp in repeat_choices:
                 inputdictation(controller, verified)
+        elif inp in ["settings"]:
+            print(controller.settings, "\n")
+            settings(controller)
+            inputdictation(controller, verified)
         else:
             if not verified:
                 print_answer(controller)
