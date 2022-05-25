@@ -274,6 +274,8 @@ class Controller:
         if self.selected_category == "word":
             word = self.selected_question
             translation = self.word_2_translation[self.selected_question]
+            if self.settings.sound:
+                self.speech_word(word)
         elif self.selected_category == "pronunciation":
             word = self.pronunciation_2_word[self.selected_question]
             translation = [self.word_2_translation[w] for w in word]
