@@ -274,8 +274,6 @@ class Controller:
         if self.selected_category == "word":
             word = self.selected_question
             translation = self.word_2_translation[self.selected_question]
-            if self.settings.sound:
-                self.speech_word(word)
         elif self.selected_category == "pronunciation":
             word = self.pronunciation_2_word[self.selected_question]
             translation = [self.word_2_translation[w] for w in word]
@@ -360,14 +358,20 @@ def contest(controller, round=20, mode="random"):
         if controller.selected_category == "pronunciation":
             pronunciation = controller.selected_question
             word = controller.input_answer("\t• word: ", controller)
+            if controller.settings.sound:
+                controller.speech_word(word)
             translation = controller.input_answer("\t• translation: ", controller)
         elif controller.selected_category == "word":
             word = controller.selected_question
+            if controller.settings.sound:
+                controller.speech_word(word)
             pronunciation = controller.input_answer("\t• pronunciation: ", controller)
             translation = controller.input_answer("\t• translation: ", controller)
         else:
             translation = controller.selected_question
             word = controller.input_answer("\t• word: ", controller)
+            if controller.settings.sound:
+                controller.speech_word(word)
             pronunciation = controller.input_answer("\t• pronunciation: ", controller)
 
         result = controller.verify_answer(
