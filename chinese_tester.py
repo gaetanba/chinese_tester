@@ -127,7 +127,7 @@ class Settings:
             sigmoide_-i   ￣\\＿
             uniform       ––––
             linear_i      /
-            linear_-i    \\
+            linear_-i     \\
             gaussian      ＿/\\＿
         )
     """
