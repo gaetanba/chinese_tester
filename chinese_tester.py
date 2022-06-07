@@ -54,8 +54,8 @@ def convert_to_int(e):
         try:
             return int(e)
         except:
-            return False
-    return False
+            return None
+    return None
 
 
 def pop_accent(character):
@@ -102,15 +102,21 @@ def convert_list_to_string(iterable):
 
 
 class Settings:
+    _available_distribution = (
+            "sigmoide_i",
+            "sigmoide_-i",
+            "uniform",
+            "linear_i",
+            "linear_-i", 
+            "gaussian"
+        )
+
     def __init__(self, controller):
         self.sound = False
         self.test_range = []
         self.controller = controller
         self.distribution = "sigmoide_i"
-        self._available_distribution = (
-            "sigmoide_i sigmoide_-i uniform linear_i linear_-i gaussian"
-        )
-
+        
     @property
     def available_range(self):
         return f"0, {len(controller._dictionary)}"
@@ -123,12 +129,12 @@ class Settings:
 
     3- distribution = {self.distribution}, 
         (
-            sigmoide_i    ＿/￣
-            sigmoide_-i   ￣\\＿
-            uniform       ––––
-            linear_i      /
-            linear_-i     \\
-            gaussian      ＿/\\＿
+            1- sigmoide_i    ＿/￣
+            2- sigmoide_-i   ￣\\＿
+            3- uniform       ––––
+            4- linear_i      /
+            5- linear_-i     \\
+            6- gaussian      ＿/\\＿
         )
     """
         return text
@@ -152,7 +158,10 @@ class Settings:
                 return False
 
         elif k in ["distribution", "3"]:
-            if v in self._available_distribution.split():
+            i = convert_to_int(v)
+            if i is not None and i <= len(self._available_distribution):
+                self.distribution = self._available_distribution[i - 1]
+            elif v in self._available_distribution:
                 self.distribution = v
             else:
                 return False
@@ -232,7 +241,16 @@ class Controller:
         if dictionary is None:
             dictionary = self.dictionary
         lenght = len(dictionary)
-        weights = sigmoide(dictionary, lamb=10 / lenght)
+        if self.settings.distribution == "sigmoide_i":
+            weights = sigmoide(dictionary, lamb=10 / lenght)
+        elif self.settings.distribution == "sigmoide_-i":
+            weights = sigmoide(dictionary, lamb=10 / lenght, increasing = False)
+        elif self.settings.distribution == "uniform":
+            weights = [1]*len(dictionary)
+        elif self.settings.distribution == "linear_i":
+            weights = range(len(dictionary))
+        elif self.settings.distribution == "linear_-i":
+            weights = range(len(dictionary), 0)
         selected_list = random.choices(dictionary, weights=weights, k=1)
         selected_item = selected_list[0]
         index = dictionary.index(selected_item)
